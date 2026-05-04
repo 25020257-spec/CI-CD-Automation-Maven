@@ -1,15 +1,14 @@
-name: Full CI/CD Pipeline
+name: Full CI CD Pipeline Optimization and Review
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ] # Bài 7: Kích hoạt khi tạo Pull Request
 
 jobs:
   build:
-    strategy:
-      matrix:
-        # Bài 4: Chạy trên nhiều hệ điều hành để đảm bảo tính đa nền tảng
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -20,19 +19,25 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          # Bài 6: Kích hoạt Caching để build nhanh hơn ở các lần sau
+          # Bài 6: Tối ưu hóa tốc độ bằng Caching
           cache: 'maven'
 
-      - name: Build and Verify with Maven
-        # Bài 5: Dùng lệnh verify để chạy Unit Test và kiểm tra JaCoCo Coverage
-        # Thêm continue-on-error để nếu có lỗi vẫn chạy tiếp bước upload report nộp bài
+      - name: Build and Verify
+        # Chạy test, đóng gói JAR và đo độ bao phủ code
         run: mvn clean verify
-        continue-on-error: true
+        continue-on-error: true 
+
+      - name: Automated Code Review
+        # Bài 7: Bot tự động bình luận lỗi Checkstyle vào Pull Request
+        uses: dbelyaev/action-checkstyle@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: warning
 
       - name: Upload JaCoCo Report
-        # Bài 5: Lưu trữ báo cáo để tải về máy nộp cho thầy/cô
+        # Bài 5: Lưu lại báo cáo để tải về nộp bài
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report-${{ matrix.os }}
+          name: jacoco-report
           path: target/site/jacoco/
