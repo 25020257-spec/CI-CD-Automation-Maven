@@ -1,29 +1,38 @@
-name: Java CI with JaCoCo
+name: Full CI/CD Pipeline
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Bài 4: Chạy trên nhiều hệ điều hành để đảm bảo tính đa nền tảng
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+          # Bài 6: Kích hoạt Caching để build nhanh hơn ở các lần sau
+          cache: 'maven'
 
-      - name: Build and Verify
-        # Lệnh verify để chạy test và tạo báo cáo JaCoCo
+      - name: Build and Verify with Maven
+        # Bài 5: Dùng lệnh verify để chạy Unit Test và kiểm tra JaCoCo Coverage
+        # Thêm continue-on-error để nếu có lỗi vẫn chạy tiếp bước upload report nộp bài
         run: mvn clean verify
-        continue-on-error: true # Ép GitHub chạy tiếp kể cả khi có lỗi để lấy Artifact
+        continue-on-error: true
 
       - name: Upload JaCoCo Report
-        if: always() # Luôn luôn upload báo cáo dù thành công hay thất bại
+        # Bài 5: Lưu trữ báo cáo để tải về máy nộp cho thầy/cô
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
+          name: jacoco-report-${{ matrix.os }}
           path: target/site/jacoco/
