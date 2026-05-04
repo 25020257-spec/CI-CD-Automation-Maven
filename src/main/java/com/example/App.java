@@ -1,12 +1,18 @@
 package com.example;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class App {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
+
     public static void main(String[] args) {
-        logger.info("Ứng dụng khởi chạy thành công!");
-        logger.info("Kết quả phép cộng: {}", add(10, 5));
+        logger.info("--- CHUONG TRINH BAT DAU ---");
+        logger.info("Ket qua phep tinh: {}", add(20, 26));
+        logger.info("--- KET THUC ---");
     }
-    public static int add(int a, int b) { return a + b; }
+
+    public static int add(int a, int b) {
+        return a + b;
+    }
 }
