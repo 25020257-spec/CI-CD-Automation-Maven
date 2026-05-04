@@ -1,4 +1,4 @@
-name: Final Submission CI
+name: Final Full CI Pipeline
 
 on:
   push:
@@ -19,28 +19,26 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'maven' # Bài 6: Caching
+          cache: 'maven'
 
       - name: Build and Package
-        # Bài 8: Tạo file JAR thực thi
-        # continue-on-error giúp build không bị đỏ nếu test lỗi
+        # Lenh nay tao file JAR cho Bai 8
         run: mvn clean package
         continue-on-error: true 
 
       - name: Checkstyle Review
-        # Bài 7: Bot review code tự động
+        # Bai 7: Bot review tu dong
         uses: dbelyaev/action-checkstyle@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           level: info
-          fail_on_error: false # Ép build XANH dù code xấu
+          fail_on_error: false 
 
       - name: Upload Artifacts
-        # Lưu lại JAR (Bài 8), JaCoCo (Bài 5), Log (Bài 9) để nộp
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: final-project-outputs
+          name: final-submission-files
           path: |
             target/*.jar
             target/site/jacoco/
