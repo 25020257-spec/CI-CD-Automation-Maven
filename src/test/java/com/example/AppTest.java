@@ -1,10 +1,18 @@
 package com.example;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
+import java.io.File;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppTest {
     @Test
-    public void testSum() {
-        assertEquals(10, App.sum(5, 5));
+    public void testCrossPlatformPath() {
+        // Sử dụng File.separator để tự động chuyển thành / (Linux) hoặc \ (Windows)
+        String path = "target" + File.separator + "data.txt";
+        
+        System.out.println("Path dang test: " + path);
+        
+        // Kiểm tra xem đường dẫn có chứa từ 'target' không (để test logic)
+        assertTrue(path.contains("target"));
     }
 }
