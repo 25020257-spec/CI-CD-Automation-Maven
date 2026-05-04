@@ -1,26 +1,33 @@
-name: Java CI with JaCoCo
+name: Java CI with JaCoCo and Matrix
 
 on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      
-      - name: Build and Verify Coverage
-        # verify sẽ chạy cả test, report và check coverage
+          cache: maven
+
+      - name: Build and Verify
+        # Lệnh verify này sẽ chạy cả Test và JaCoCo Check
         run: mvn clean verify
 
       - name: Upload JaCoCo Report
-        # Lưu báo cáo để xem sau (yêu cầu đề bài)
-        if: always() # Luôn chạy kể cả khi build fail để xem tại sao thiếu coverage
+        # Luôn upload báo cáo kể cả khi build thất bại để xem lỗi
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jacoco-report
+          name: jacoco-report-${{ matrix.os }}
           path: target/site/jacoco/
